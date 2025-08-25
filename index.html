@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANGARALI — Geliştirilmiş</title>
+    <!-- Tailwind CSS CDN'i yükleniyor. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Matrix efektini tam ekran kaplamak için özel CSS */
+        #matrix-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            pointer-events: none;
+            /* Genişlik ve yüksekliği tam ekran yapıyoruz. */
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Tüm elementler için gölgeli, neon yeşili metin efekti */
+        .neon-text {
+            text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+        }
+
+        /* Terminal komutları için yanıp sönen imleç animasyonu */
+        @keyframes blink-cursor {
+            50% { border-color: transparent; }
+        }
+        .blinking-cursor {
+            border-right: 2px solid #00ff00;
+            animation: blink-cursor 1s step-end infinite;
+        }
+    </style>
+</head>
+<body class="bg-black text-green-400 font-mono overflow-hidden flex flex-col items-center justify-center h-screen">
+
+    <!-- Matrix yağmuru için canvas elementi -->
+    <canvas id="matrix-canvas"></canvas>
+
+    <!-- Ana içerik alanı -->
+    <div class="relative z-10 flex flex-col items-center justify-center p-8 bg-black bg-opacity-70 rounded-2xl shadow-lg border-2 border-green-500 max-w-4xl w-11/12 mx-auto">
+        <!-- Başlık -->
+        <h1 class="text-6xl sm:text-7xl lg:text-9xl font-bold neon-text animate-pulse">ANGARALI</h1>
+
+        <!-- Terminal bölümü -->
+        <div id="terminal-container" class="mt-8 w-full p-4 bg-black bg-opacity-90 rounded-xl border border-green-500 shadow-md">
+            <div id="terminal-output" class="text-sm sm:text-base whitespace-pre-wrap"></div>
+            <div class="flex items-center">
+                <span class="text-green-300 mr-2">$</span>
+                <span id="typing-text" class="blinking-cursor"></span>
+            </div>
+        </div>
+        
+        <!-- Etkileşimli buton -->
+        <button id="action-button" class="mt-8 px-6 py-3 bg-green-500 text-black font-bold rounded-full shadow-lg hover:bg-green-400 transition-colors duration-300 transform hover:scale-105">
+            Daha Fazla Bilgi
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Matrix efektinin JavaScript kodu
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Canvas boyutlarını CSS'ten alıyoruz
+            let w = canvas.width = window.innerWidth;
+            let h = canvas.height = window.innerHeight;
+            let p = Array(Math.ceil(w / 10)).fill(0);
+            
+            const random = () => {
+                const matrixChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZÇĞİÖŞÜçğiöşü+-*/=!@#$%^&*()_[]{}|;:',.<>?/~`";
+                return matrixChars[Math.floor(Math.random() * matrixChars.length)];
+            }
+            
+            const matrix = () => {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = "#00ff00";
+                p.forEach((v, i) => {
+                    ctx.fillText(random(), i * 10, v);
+                    p[i] = v > h + Math.random() * 10000 ? 0 : v + 10;
+                });
+            };
+            
+            setInterval(matrix, 50);
+
+            // Ekran boyutu değiştiğinde canvas'ı yeniden boyutlandırmak için
+            window.addEventListener('resize', () => {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            });
+            
+            // Terminalde yazı yazma efekti
+            const terminalOutput = document.getElementById('terminal-output');
+            const typingTextSpan = document.getElementById('typing-text');
+            const actionButton = document.getElementById('action-button');
+            const commands = [
+                "Bağlantı kuruluyor...",
+                "Angaralı sunucusu bulundu.",
+                "Erişim izni için parola bekleniyor..."
+            ];
+            let commandIndex = 0;
+            let charIndex = 0;
+            
+            function typeWriter() {
+                if (commandIndex < commands.length) {
+                    if (charIndex < commands[commandIndex].length) {
+                        typingTextSpan.textContent += commands[commandIndex].charAt(charIndex);
+                        charIndex++;
+                        setTimeout(typeWriter, 50);
+                    } else {
+                        terminalOutput.innerHTML += `<div><span class="text-green-300">$</span> ${commands[commandIndex]}</div>`;
+                        typingTextSpan.textContent = '';
+                        charIndex = 0;
+                        commandIndex++;
+                        if (commandIndex < commands.length) {
+                            setTimeout(typeWriter, 1000);
+                        }
+                    }
+                }
+            }
+
+            // Butona tıklama olayı
+            actionButton.addEventListener('click', () => {
+                const messages = [
+                    "Erişim izni verildi.",
+                    "Bağlantı başarılı.",
+                    "Angaralı'nın dünyasına hoş geldin!"
+                ];
+                terminalOutput.innerHTML += `<div class="text-yellow-400 mt-2">Daha fazla bilgi isteği alındı.</div>`;
+                messages.forEach((msg, i) => {
+                    setTimeout(() => {
+                        terminalOutput.innerHTML += `<div><span class="text-green-300">$</span> ${msg}</div>`;
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                    }, 500 * (i + 1));
+                });
+            });
+
+            // Başlangıçta yazma efektini başlat
+            typeWriter();
+        });
+    </script>
+</body>
+</html>
