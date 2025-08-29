@@ -104,7 +104,8 @@
             ];
             let commandIndex = 0;
             let charIndex = 0;
-            
+            let buttonClicked = false; // Buton tıklama durumu
+
             function typeWriter() {
                 if (commandIndex < commands.length) {
                     if (charIndex < commands[commandIndex].length) {
@@ -125,18 +126,21 @@
 
             // Butona tıklama olayı
             actionButton.addEventListener('click', () => {
-                const messages = [
-                    "Erişim izni verildi.",
-                    "Bağlantı başarılı.",
-                    "Angaralı'nın dünyasına hoş geldin!"
-                ];
-                terminalOutput.innerHTML += `<div class="text-yellow-400 mt-2">Daha fazla bilgi isteği alındı.</div>`;
-                messages.forEach((msg, i) => {
-                    setTimeout(() => {
-                        terminalOutput.innerHTML += `<div><span class="text-green-300">$</span> ${msg}</div>`;
-                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                    }, 500 * (i + 1));
-                });
+                if (!buttonClicked) { // Buton yalnızca bir kez tıklanabilir
+                    buttonClicked = true; // Tıklama durumu güncelleniyor
+                    const messages = [
+                        "Erişim izni verildi.",
+                        "Bağlantı başarılı.",
+                        "Angaralı'nın dünyasına hoş geldin!"
+                    ];
+                    terminalOutput.innerHTML += `<div class="text-yellow-400 mt-2">Daha fazla bilgi isteği alındı.</div>`;
+                    messages.forEach((msg, i) => {
+                        setTimeout(() => {
+                            terminalOutput.innerHTML += `<div><span class="text-green-300">$</span> ${msg}</div>`;
+                            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                        }, 500 * (i + 1));
+                    });
+                }
             });
 
             // Başlangıçta yazma efektini başlat
